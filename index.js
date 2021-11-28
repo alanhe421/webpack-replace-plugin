@@ -34,7 +34,7 @@ function replaceTxtLoader(source, replaceQueue) {
   return source;
 }
 
-class DomainReplacePlugin {
+class ReplacePlugin {
   constructor(options = {}) {
     this.name = 'domain-replace-plugin';
     this.options = options;
@@ -71,5 +71,5 @@ class DomainReplacePlugin {
 }
 
 module.exports = {
-  DomainReplacePlugin
+  ReplacePlugin
 }
