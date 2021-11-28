@@ -1,0 +1,24 @@
+{
+  "name": "@stacker/webpack-replace-plugin",
+  "version": "1.0.0",
+  "description": "## 使用",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alanhg/replace-plugin.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alanhg/replace-plugin/issues"
+  },
+  "homepage": "https://github.com/alanhg/replace-plugin#readme",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "esprima": "^4.0.1",
+    "webpack-sources": "^1.0.1"
+  }
+}
