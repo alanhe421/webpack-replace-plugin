@@ -50,7 +50,7 @@ class ReplacePlugin {
       compilation.hooks.optimizeChunkAssets.tap(_this.name, chunks => {
         chunks.forEach(chunk => {
           chunk.files.forEach(filename => {
-            if (!filename.match(/\.js$/)) {
+            if (!filename.match(/\.js(\?.+)?$/)) {
               return;
             }
             console.log(`${_this.name} 🧱，${filename} replaced`.info);

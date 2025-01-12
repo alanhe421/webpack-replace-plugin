@@ -1,6 +1,6 @@
 {
   "name": "@stacker/webpack-replace-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "## 使用",
   "main": "index.js",
   "scripts": {
