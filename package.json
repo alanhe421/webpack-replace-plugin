@@ -1,6 +1,6 @@
 {
   "name": "@stacker/webpack-replace-plugin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "## 使用",
   "homepage": "https://github.com/alanhg/replace-plugin#readme",
   "bugs": {
