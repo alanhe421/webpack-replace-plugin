@@ -1,5 +1,5 @@
 const esprima = require('esprima');
-const Source = require('webpack-sources')
+const Source = require('webpack-sources');
 const colors = require('colors');
 
 const fs = require('fs');
@@ -15,17 +15,25 @@ colors.setTheme({
   help: 'cyan',
   warn: 'yellow',
   debug: 'blue',
-  error: 'red'
+  error: 'red',
 });
 
-function replaceTxtLoader(source, replaceQueue) {
+/**
+ * 内置替换规则
+ */
+const DEFAULT_REPLACE_QUEUE = [];
+
+function replaceTextLoader(source, { replaceQueue = [], skipDefault = false } = {
+  replaceQueue: [],
+  skipDefault: false,
+}) {
   const tokenization = esprima.tokenize(source);
   tokenization.forEach((item) => {
     if (item.type !== 'String') return;
     const mark = item.value.charAt(0);
     const {value} = item;
     let res = value;
-    replaceQueue.forEach((obj) => {
+    replaceQueue.concat(skipDefault ? [] : DEFAULT_REPLACE_QUEUE).forEach((obj) => {
       res = res.replace(obj.reg, `${mark} + ${obj.value} + ${mark}`);
     });
     if (value === res) return;
@@ -36,40 +44,40 @@ function replaceTxtLoader(source, replaceQueue) {
 
 class ReplacePlugin {
   constructor(options = {}) {
-    this.name = 'domain-replace-plugin';
-    this.options = options;
-    if (!Array.isArray(this.options.replaceQueue) || this.options.replaceQueue.length === 0) {
-      console.log('')
-      throw 'error';
-    }
+    this.name = 'replace-plugin';
+    this.options = {
+      debug: false,
+      ...options,
+    };
   }
 
   apply(compiler) {
-    let _this = this;
-    compiler.hooks.compilation.tap(_this.name, compilation => {
-      compilation.hooks.optimizeChunkAssets.tap(_this.name, chunks => {
-        chunks.forEach(chunk => {
-          chunk.files.forEach(filename => {
+    const _this = this;
+    compiler.hooks.compilation.tap(_this.name, (compilation) => {
+      compilation.hooks.optimizeChunkAssets.tap(_this.name, (chunks) => {
+        chunks.forEach((chunk) => {
+          chunk.files.forEach((filename) => {
             if (!filename.match(/\.js(\?.+)?$/)) {
               return;
             }
             console.log(`${_this.name} 🧱，${filename} replaced`.info);
-            let asset = compilation.assets[filename];
-            let sourceStr = asset.source();
-            let sourceStrNew = replaceTxtLoader(sourceStr, this.options.replaceQueue);
+            const asset = compilation.assets[filename];
+            const sourceStr = asset.source();
+            const sourceStrNew = replaceTextLoader(sourceStr, _this.options);
             compilation.assets[filename] = new Source.RawSource(sourceStrNew);
-            if (this.options.debug) {
+            if (_this.options.debug) {
               const filenameWithoutExt = path.parse(filename).name;
               fs.writeFileSync(`./${filenameWithoutExt}-replaced-before.js`, sourceStr, 'utf8');
               fs.writeFileSync(`./${filenameWithoutExt}-replaced-after.js`, sourceStrNew, 'utf8');
             }
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
   }
 }
 
 module.exports = {
-  ReplacePlugin
-}
+  ReplacePlugin,
+  replaceTextLoader,
+};
