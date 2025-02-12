@@ -53,26 +53,24 @@ class ReplacePlugin {
 
   apply(compiler) {
     const _this = this;
-    compiler.hooks.compilation.tap(_this.name, (compilation) => {
-      compilation.hooks.optimizeChunkAssets.tap(_this.name, (chunks) => {
-        chunks.forEach((chunk) => {
-          chunk.files.forEach((filename) => {
-            if (!filename.match(/\.js(\?.+)?$/)) {
-              return;
-            }
-            console.log(`${_this.name} 🧱，${filename} replaced`.info);
-            const asset = compilation.assets[filename];
-            const sourceStr = asset.source();
-            const sourceStrNew = replaceTextLoader(sourceStr, _this.options);
-            compilation.assets[filename] = new Source.RawSource(sourceStrNew);
-            if (_this.options.debug) {
-              const filenameWithoutExt = path.parse(filename).name;
-              fs.writeFileSync(`./${filenameWithoutExt}-replaced-before.js`, sourceStr, 'utf8');
-              fs.writeFileSync(`./${filenameWithoutExt}-replaced-after.js`, sourceStrNew, 'utf8');
-            }
-          });
-        });
+    compiler.hooks.emit.tapAsync(_this.name, (compilation, callback) => {
+      const { assets } = compilation;
+      Object.keys(assets).forEach((filename) => {
+        if (!filename.match(/\.js(\?.+)?$/)) {
+          return;
+        }
+        const asset = assets[filename];
+        const sourceStr = asset.source();
+        const sourceStrNew = replaceTextLoader(sourceStr, _this.options);
+        compilation.assets[filename] = new Source.RawSource(sourceStrNew);
+        console.log(`${_this.name} 🧱，${filename} replaced`.info);
+        if (_this.options.debug) {
+          const filenameWithoutExt = path.parse(filename).name;
+          fs.writeFileSync(`./${filenameWithoutExt}-replaced-before.js`, sourceStr, 'utf8');
+          fs.writeFileSync(`./${filenameWithoutExt}-replaced-after.js`, sourceStrNew, 'utf8');
+        }
       });
+      callback();
     });
   }
 }
