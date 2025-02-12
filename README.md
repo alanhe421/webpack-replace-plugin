@@ -2,6 +2,9 @@
 
 ## 使用
 
+
+⚠️`仅支持生产模式打包`
+
 ```javascript
 const {ReplacePlugin} = require('@stacker/webpack-replace-plugin');
 
